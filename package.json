@@ -15,9 +15,11 @@
 		"@types/node": "^24.8.1",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
-		"wrangler": "^4.43.0"
+		"wrangler": "^4.54.0"
 	},
 	"dependencies": {
-		"hafas-client": "^6.3.5"
+		"hafas-client": "^6.3.5",
+		"itty-router": "^5.0.22",
+		"liquidjs": "^10.24.0"
 	}
 }

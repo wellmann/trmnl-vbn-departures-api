@@ -36,10 +36,12 @@ export const mockHafasClient = {
   departures: vi.fn().mockResolvedValue(mockDeparturesResponse)
 };
 
+// Mock hafas-client module directly
 vi.mock('hafas-client', () => ({
-  createClient: () => mockHafasClient
+  createClient: vi.fn(() => mockHafasClient)
 }));
 
+// Also mock the profile
 vi.mock('hafas-client/p/vbn/index.js', () => ({
   profile: {}
 }));

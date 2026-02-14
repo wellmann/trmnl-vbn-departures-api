@@ -14,7 +14,7 @@ describe('TRMNL VBN departures API worker', () => {
 
   describe('Authentication', () => {
     it('returns 401 when API key is missing', async () => {
-      const request = new IncomingRequest('http://example.com/locations?query=Bremen');
+      const request = new IncomingRequest('http://example.com/api/v6/locations?query=Bremen');
       const ctx = createExecutionContext();
       const response = await worker.fetch(request, env, ctx);
       await waitOnExecutionContext(ctx);
@@ -22,7 +22,7 @@ describe('TRMNL VBN departures API worker', () => {
     });
 
     it('accepts requests with valid API key', async () => {
-      const request = new IncomingRequest('http://example.com/locations?query=Bremen', {
+      const request = new IncomingRequest('http://example.com/api/v6/locations?query=Bremen', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();
@@ -32,9 +32,9 @@ describe('TRMNL VBN departures API worker', () => {
     });
   });
 
-  describe('/locations endpoint', () => {
+  describe('locations endpoint', () => {
     it('returns 400 when query parameter is missing', async () => {
-      const request = new IncomingRequest('http://example.com/locations', {
+      const request = new IncomingRequest('http://example.com/api/v6/locations', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();
@@ -44,7 +44,7 @@ describe('TRMNL VBN departures API worker', () => {
     });
 
     it('returns JSON response for valid location query', async () => {
-      const request = new IncomingRequest('http://example.com/locations?query=Bremen', {
+      const request = new IncomingRequest('http://example.com/api/v6/locations?query=Bremen', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();
@@ -60,9 +60,9 @@ describe('TRMNL VBN departures API worker', () => {
     });
   });
 
-  describe('/departures endpoint', () => {
+  describe('departures endpoint', () => {
     it('returns JSON response for valid stop ID', async () => {
-      const request = new IncomingRequest('http://example.com/departures/12345', {
+      const request = new IncomingRequest('http://example.com/api/v6/departures/12345', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();
@@ -74,7 +74,7 @@ describe('TRMNL VBN departures API worker', () => {
 
       const responseData = await response.json();
       expect(responseData).toEqual(mockDeparturesResponse);
-      expect(mockHafasClient.departures).toHaveBeenCalledWith('12345', { duration: 20, results: 5 });
+      expect(mockHafasClient.departures).toHaveBeenCalledWith('12345', { duration: 30, results: 7 });
     });
   });
 
@@ -94,7 +94,7 @@ describe('TRMNL VBN departures API worker', () => {
     it('handles HAFAS client errors for locations', async () => {
       mockHafasClient.locations.mockRejectedValueOnce(new Error('HAFAS error'));
 
-      const request = new IncomingRequest('http://example.com/locations?query=Bremen', {
+      const request = new IncomingRequest('http://example.com/api/v6/locations?query=Bremen', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();
@@ -107,7 +107,7 @@ describe('TRMNL VBN departures API worker', () => {
     it('handles HAFAS client errors for departures', async () => {
       mockHafasClient.departures.mockRejectedValueOnce(new Error('HAFAS error'));
 
-      const request = new IncomingRequest('http://example.com/departures/12345', {
+      const request = new IncomingRequest('http://example.com/api/v6/departures/12345', {
         headers: { 'Authorization': `Bearer ${API_KEY}` }
       });
       const ctx = createExecutionContext();

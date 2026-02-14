@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBN Departures</title>
+    <style>
+		.view--full {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+			flex-grow: 1;
+		}
+
+		.table th {
+			text-align: left;
+			border-bottom: 2px solid #000;
+			padding: 8px 4px;
+		}
+
+		.table td {
+			padding: 12px 4px;
+			border-bottom: 1px solid #ccc;
+			vertical-align: middle;
+		}
+
+		.table tr:last-child td {
+			border-bottom: none;
+		}
+
+		.label--inverted {
+			background-color: #000;
+			color: #fff;
+			padding: 2px 4px;
+			border-radius: 2px;
+		}
+
+		.label--gray {
+			color: #666;
+		}
+
+		.title_bar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px 0;
+			border-top: 2px solid #000;
+			margin-top: auto;
+		}
+	</style>
+</head>
+<body class="environment trmnl">
+	<div class="screen">
+		<div class="view view--full">
+			{% include "partials/shared" %}
+			{% include "partials/full" %}
+		</div>
+	</div>
+</body>
+</html>

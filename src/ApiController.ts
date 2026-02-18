@@ -26,9 +26,9 @@ export default class ApiController {
 
 		try {
 			const client = await this.clientFactory.create(env);
-			const locations = await client.locations(query, { results: 5 });
+			const data = await client.locations(query, { results: 5 }) as DeparturesResponse;
 
-			return json(locations);
+			return json(data);
 		} catch (err) {
 			return error(500, `Failed to fetch locations: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		}

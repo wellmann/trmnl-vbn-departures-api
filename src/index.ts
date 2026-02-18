@@ -6,7 +6,7 @@ import HafasClientFactory from './HafasClientFactory';
 const router = AutoRouter();
 const hafasClientFactory = new HafasClientFactory();
 const apiController = new ApiController(hafasClientFactory);
-const previewController = new PreviewController(hafasClientFactory);
+const previewController = new PreviewController(apiController);
 
 router.all('/api/*', apiController.auth);
 router.get('/api/v6/locations', apiController.getLocations);

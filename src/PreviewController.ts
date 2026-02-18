@@ -1,5 +1,5 @@
 import { error, html, IRequestStrict } from 'itty-router';
-import HafasClientFactory from './HafasClientFactory';
+import ApiController from './ApiController';
 import htmlLayout from '../views/html.liquid';
 import trmnlLayout from '../views/trmnl.liquid';
 import fullPartial from '../views/partials/full.liquid';
@@ -17,10 +17,10 @@ const LAYOUTS = {
 };
 
 export default class PreviewController {
-	protected clientFactory: HafasClientFactory;
+	protected apiController: ApiController;
 
-	public constructor(clientFactory: HafasClientFactory) {
-		this.clientFactory = clientFactory;
+	public constructor(apiController: ApiController) {
+		this.apiController = apiController;
 	}
 
 	public auth = (request: IRequestStrict, env: Env) => {
@@ -62,22 +62,23 @@ export default class PreviewController {
 		}
 
 		const departuresUrl = new URL(`/api/v6/departures/${stopId}`, url.origin);
-		const departuresResponse = await fetch(departuresUrl.toString(), {
-			headers: { 'Authorization': `Bearer ${env.API_KEY}` }
-		});
+
+		const departuresRequest = new Request(departuresUrl.toString()) as IRequestStrict;
+		departuresRequest.params = { stopId };
+		const departuresResponse = await this.apiController.getDepartures(departuresRequest, env);
 
 		if (!departuresResponse.ok) {
-			return error(departuresResponse.status, 'Failed to fetch departures');
+			return departuresResponse;
 		}
 
-		const departures = await departuresResponse.json();
+		const { departures, realtimeDataUpdatedAt } = await departuresResponse.json() as DeparturesResponse;
 
 		try {
 			const engine = new TrmnlLiquid();
 			const processedLayout = this.resolvePartials(layout);
 			const rendered = await engine.parseAndRender(processedLayout, {
 				departures,
-				realtimeDataUpdatedAt: new Date().toISOString(),
+				realtimeDataUpdatedAt,
 				trmnl: {
 					plugin_settings: {
 						custom_fields_values: {

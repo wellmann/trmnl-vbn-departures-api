@@ -43,18 +43,13 @@ export default class ApiController {
 		try {
 			const client = await this.clientFactory.create(env);
 			const url = new URL(request.url);
-			const duration = this.parseQueryParam(url, 'duration', DEFAULT_DURATION);
-			const results = this.parseQueryParam(url, 'results', DEFAULT_RESULTS);
-			const departures = await client.departures(stopId, { duration, results });
+			const duration =  parseInt(url.searchParams.get('duration') || '')  || DEFAULT_DURATION;
+			const results = parseInt(url.searchParams.get('results') || '') || DEFAULT_RESULTS;
+			const data = await client.departures(stopId, { duration, results });
 
-			return json(departures);
+			return json(data);
 		} catch (err) {
 			return error(500, `Failed to fetch departures: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		}
-	};
-
-	private parseQueryParam(url: URL, key: string, defaultValue: number): number {
-		const value = parseInt(url.searchParams.get(key) || '');
-		return value > 0 ? Math.min(defaultValue, value) : defaultValue;
 	};
 }

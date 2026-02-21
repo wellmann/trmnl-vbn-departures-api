@@ -7,6 +7,7 @@ export default class TrmnlLiquid extends Liquid {
 	constructor(options?: LiquidOptions) {
 		super(options);
 		this.registerCustomTags();
+		this.registerCustomFilters();
 	}
 
 	private registerCustomTags() {
@@ -71,6 +72,16 @@ export default class TrmnlLiquid extends Liquid {
 				}
 
 				emitter.write(html);
+			}
+		});
+	}
+
+	private registerCustomFilters() {
+		this.registerFilter('parse_json', (str: string) => {
+			try {
+				return JSON.parse(str);
+			} catch (e) {
+				return null;
 			}
 		});
 	}

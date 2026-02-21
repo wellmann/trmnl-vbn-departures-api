@@ -87,6 +87,7 @@ export default class PreviewController {
 						}
 					},
 					user: {
+						locale: 'de',
 						utc_offset: new Date().getTimezoneOffset() / -60
 					}
 				}

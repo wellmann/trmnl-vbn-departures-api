@@ -5,14 +5,16 @@
 			"departure": "Departure",
 			"delay": "Delay",
 			"direction": "Direction",
-			"line": "Line"
+			"line": "Line",
+			"no_departures_warning": "Error: No departures data received"
 		},
 		"de": {
 			"leave_home": "Haus verlassen",
 			"departure": "Abfahrt",
 			"delay": "Verspätung",
 			"direction": "Richtung",
-			"line": "Linie"
+			"line": "Linie",
+			"no_departures_warning": "Fehler: Keine Abfahrtsdaten empfangen"
 		}
 	}
 {% endcapture %}
@@ -42,49 +44,66 @@
 	{% assign show_provider = true %}
 {% endif %}
 
-<div class="layout layout--top layout--stretch-x">
-	<table class="table {{ table_class }}">
-		<thead>
-		<tr>
-			<th><span class="title {{ title_class }}">{% render "icon_walk", size: icon_size %}</span></th>
-			<th><span class="title {{ title_class }}">{{ i18n.departure }}</span></th>
-			{% if show_delay_column %}
-				<th><span class="title {{ title_class }}">{{ i18n.delay }}</span></th>
-			{% endif %}
-			<th><span class="title {{ title_class }}">{{ i18n.direction }}</span></th>
-			<th><span class="title {{ title_class }}">{{ i18n.line }}</span></th>
-		</tr>
-		</thead>
-		<tbody>
-		{% for item in departures limit: row_limit %}
-			{% assign seconds_to_stop = trmnl.plugin_settings.custom_fields_values.minutesToStation | times: 60 %}
-			{% assign delay_minutes = item.delay | divided_by: 60 %}
-			<tr>
-				<td><span class="label">{{ item.when | date: "%s" | plus: trmnl.user.utc_offset | minus: seconds_to_stop | date: "%H:%M" }}</span></td>
-				{% if show_delay_column %}
-					<td><span class="label">{{ item.plannedWhen | date: "%H:%M" }}</span></td>
-					<td>
-						{% if item.delay > 0 %}
-							<span class="label label--inverted">+{{ delay_minutes }}m</span>
+{% if departures.size > 0 %}
+	<div class="layout layout--top layout--stretch-x">
+		<table class="table {{ table_class }}">
+			<thead>
+				<tr>
+					<th><span class="title {{ title_class }}">{% render "icon_walk", size: icon_size %}</span></th>
+					<th><span class="title {{ title_class }}">{{ i18n.departure }}</span></th>
+					{% if show_delay_column %}
+						<th><span class="title {{ title_class }}">{{ i18n.delay }}</span></th>
+					{% endif %}
+					<th><span class="title {{ title_class }}">{{ i18n.direction }}</span></th>
+					<th><span class="title {{ title_class }}">{{ i18n.line }}</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in departures limit: row_limit %}
+					{% assign seconds_to_stop = trmnl.plugin_settings.custom_fields_values.minutesToStation | times: 60 %}
+					{% assign delay_minutes = item.delay | divided_by: 60 %}
+					<tr>
+						<td><span class="label">{{ item.when | date: "%s" | plus: trmnl.user.utc_offset | minus: seconds_to_stop | date: "%H:%M" }}</span></td>
+						{% if show_delay_column %}
+							<td><span class="label">{{ item.plannedWhen | date: "%H:%M" }}</span></td>
+							<td>
+								{% if item.delay > 0 %}
+									<span class="label label--inverted">+{{ delay_minutes }}m</span>
+								{% else %}
+									<span class="label label--gray">±0</span>
+								{% endif %}
+							</td>
 						{% else %}
-							<span class="label label--gray">±0</span>
+							<td>
+								<span class="label label--small">{{ item.plannedWhen | date: "%H:%M" }}</span>
+								{% if item.delay > 0 %}
+									<span class="label label--small label--inverted">+{{ delay_minutes }}m</span>
+								{% endif %}
+							</td>
 						{% endif %}
-					</td>
-				{% else %}
-					<td>
-						<span class="label label--small">{{ item.plannedWhen | date: "%H:%M" }}</span>
-						{% if item.delay > 0 %}
-							<span class="label label--small label--inverted">+{{ delay_minutes }}m</span>
-						{% endif %}
-					</td>
-				{% endif %}
-				<td><span class="label">{{ item.direction }}{% if compact %} | truncate: 21{% endif %}</span></td>
-				<td><span class="label{% if compact %} label--small{% endif %}">{{ item.line.name }}</span></td>
-			</tr>
-		{% endfor %}
-		</tbody>
-	</table>
-</div>
+						<td><span class="label">{{ item.direction }}{% if compact %} | truncate: 21{% endif %}</span></td>
+						<td><span class="label{% if compact %} label--small{% endif %}">{{ item.line.name }}</span></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% else %}
+	<div class="layout layout--center-x layout--center-y">
+		<div>
+			<div class="text--center">
+				{% render "icon_warning", size: logo_size %}
+			</div>
+			<p class="mt--2 text--center label label--small">
+				{{ i18n.no_departures_warning }}<br>
+				Timestamp: {{ trmnl.system.timestamp_utc }}
+			</p>
+			<div class="mt--2 text--center">
+				{{ "fahrplaner://" | qr_code }}
+			</div>
+		</div>
+	</div>
+{% endif %}
 
 <div class="title_bar">
 	{% case trmnl.plugin_settings.custom_fields_values.provider %}
@@ -101,6 +120,11 @@
 {% template icon_walk %}
 {% if size > 0 %}{% assign icon_size = size %}{% else %}{% assign icon_size = 24 %}{% endif %}
 	<img class="image" width="{{ icon_size }}" height="{{ icon_size }}" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="%23000" viewBox="0 -960 960 960"><path d="m280-40 112-564-72 28v136h-80v-188l202-86q14-6 29.5-7t29.5 4q14 5 26.5 14t20.5 23l40 64q26 42 70.5 69T760-520v80q-70 0-125-29t-94-74l-25 123 84 80v300h-80v-260l-84-64-72 324h-84Zm260-700q-33 0-56.5-23.5T460-820q0-33 23.5-56.5T540-900q33 0 56.5 23.5T620-820q0 33-23.5 56.5T540-740Z"/></svg>'  alt="{{ i18n.leave_home }}"/>
+{% endtemplate %}
+
+{% template icon_warning %}
+{% if size > 0 %}{% assign icon_size = size %}{% else %}{% assign icon_size = 30 %}{% endif %}
+<img class="image" width="{{ icon_size }}" height="{{ icon_size }}" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="%23000" viewBox="0 0 32 32"><path d="M16 2.899l13.409 26.726h-26.819l13.409-26.726zM16 0c-0.69 0-1.379 0.465-1.903 1.395l-13.659 27.222c-1.046 1.86-0.156 3.383 1.978 3.383h27.166c2.134 0 3.025-1.522 1.978-3.383h0l-13.659-27.222c-0.523-0.93-1.213-1.395-1.903-1.395v0z"></path><path d="M18 26c0 1.105-0.895 2-2 2s-2-0.895-2-2c0-1.105 0.895-2 2-2s2 0.895 2 2z"></path><path d="M16 22c-1.105 0-2-0.895-2-2v-6c0-1.105 0.895-2 2-2s2 0.895 2 2v6c0 1.105-0.895 2-2 2z"></path></svg>'  alt=""/>
 {% endtemplate %}
 
 {% template logo_vbn %}

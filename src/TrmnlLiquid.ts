@@ -45,7 +45,7 @@ export default class TrmnlLiquid extends Liquid {
 				this.targetName = match[1];
 				this.paramsString = match[2] || '';
 			},
-			*render(ctx: Context, emitter: any) {
+			*render(ctx: Context, emitter: any): Generator {
 				const templateTokens = self.customTemplates.get(this.targetName);
 
 				if (!templateTokens) {
@@ -57,7 +57,7 @@ export default class TrmnlLiquid extends Liquid {
 					const scope: Record<string, any> = {};
 					const paramPairs = this.paramsString.split(',').map((p: string) => p.trim());
 					for (const pair of paramPairs) {
-						const [key, value] = pair.split(':').map(s => s.trim());
+						const [key, value] = pair.split(':').map((s: string) => s.trim());
 						scope[key] = yield self.evalValue(value, ctx);
 					}
 					ctx.push(scope);

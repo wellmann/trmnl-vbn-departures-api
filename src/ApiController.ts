@@ -12,7 +12,14 @@ export default class ApiController {
 	}
 
 	public auth = (request: IRequestStrict, env: Env) => {
-		if (request.headers.get('Authorization') !== 'Bearer ' + env.API_KEY) {
+		const authHeader = request.headers.get('Authorization');
+		const url = new URL(request.url);
+		const apiKeyParam = url.searchParams.get('apiKey');
+
+		const isValidHeader = authHeader === 'Bearer ' + env.API_KEY;
+		const isValidParam = apiKeyParam === env.API_KEY;
+
+		if (!isValidHeader && !isValidParam) {
 			return error(401, 'Unauthorized');
 		}
 	};

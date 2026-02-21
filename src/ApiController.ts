@@ -12,6 +12,10 @@ export default class ApiController {
 	}
 
 	public auth = (request: IRequestStrict, env: Env) => {
+		if (request.method === "OPTIONS") {
+			return;
+		}
+
 		const authHeader = request.headers.get('Authorization');
 		const url = new URL(request.url);
 		const apiKeyParam = url.searchParams.get('apiKey');

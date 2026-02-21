@@ -1,9 +1,14 @@
-import { AutoRouter } from 'itty-router';
+import { AutoRouter, cors } from 'itty-router';
 import ApiController from './ApiController';
 import PreviewController from './PreviewController';
 import HafasClientFactory from './HafasClientFactory';
 
-const router = AutoRouter();
+const { preflight, corsify } = cors();
+const router = AutoRouter({
+	before: [preflight],
+	finally: [corsify],
+});
+
 const hafasClientFactory = new HafasClientFactory();
 const apiController = new ApiController(hafasClientFactory);
 const previewController = new PreviewController(apiController);

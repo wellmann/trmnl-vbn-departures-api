@@ -34,17 +34,18 @@ Authorization: Bearer YOUR_API_KEY
 - `results` (optional): Maximum number of results (default: 7)
 
 ### Preview Templates
-Preview TRMNL templates with live data:
+Preview the full-screen layout with live data:
 ```
 GET /preview/{template}?stop={stopId}
 Authorization: Bearer YOUR_API_KEY
 ```
 
-**Available Templates:**
-- `full` - Full screen layout
-- `half_horizontal` - Half screen horizontal layout
-- `half_vertical` - Half screen vertical layout
-- `quadrant` - Quarter screen layout
+**Templates for the TRMNL Plugin Markup Editor:**
+- `views/partials/full` - Full screen layout (large)
+- `views/partials/half_horizontal` - Half screen horizontal layout (small)
+- `views/partials/half_vertical` - Half screen vertical layout (large and compact)
+- `views/partials/uadrant` - Quarter screen layout (small and compact)
+- `views/partials/shared` - Base layout and logic
 
 ## Setup
 
